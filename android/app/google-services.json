@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "700177199481",
+    "project_id": "share-recipe-58b1b",
+    "storage_bucket": "share-recipe-58b1b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700177199481:android:0380386e0e7ffe45da7fa8",
+        "android_client_info": {
+          "package_name": "com.example.share_recipe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4e6DcEIHFVoPEX8JMW23A_sYtNnE5L5I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
