@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_recipe/providers/auth_provider.dart';
-import 'package:share_recipe/screen/auth/page.dart';
-import 'package:share_recipe/screen/page.dart';
+import 'package:share_recipe/screens/auth/auth_screen.dart';
+import 'package:share_recipe/screens/home_screen.dart';
 import 'package:share_recipe/services/firebase_service.dart';
 
 void main() async {
@@ -22,7 +22,7 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
       ),
-      home: user == null ? AuthPageMain() : RootPageMain(),
+      home: user == null ? AuthScreen() : HomeScreen(),
     );
   }
 }
