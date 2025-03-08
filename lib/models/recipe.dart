@@ -4,7 +4,6 @@ part 'recipe.freezed.dart';
 part 'recipe.g.dart';
 
 @freezed
-@JsonSerializable()
 class Recipe with _$Recipe {
   const factory Recipe({
     String? id,
