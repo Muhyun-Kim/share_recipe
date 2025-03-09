@@ -2,6 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:share_recipe/components/error.dart';
+import 'package:share_recipe/models/recipe.dart';
+import 'package:share_recipe/services/recipe_service.dart';
+import 'package:share_recipe/utils/function.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -64,6 +68,27 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     }
   }
 
+  Future<void> _saveRecipe() async {
+    if (_selectedImg == null) {
+      showErrorSnackBar(context, "画像を選択してください");
+      return;
+    }
+    final compressedImg = await compressImg(_selectedImg!);
+    final imgUrl = await recipeService.uploadImage(XFile(compressedImg.path));
+    if (imgUrl.isEmpty) {
+      return;
+    }
+    if (_formKey.currentState!.validate()) {
+      final recipe = Recipe(
+        title: _titleController.text,
+        description: _descriptionController.text,
+        ingredients: _ingredients.map((e) => e["ingredient"]!.text).toList(),
+        imageUrl: imgUrl,
+      );
+      await recipeService.addRecipe(recipe);
+    }
+  }
+
   @override
   void dispose() {
     for (var controllers in _ingredients) {
@@ -79,6 +104,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text("レシピ登録"),
+        actions: [IconButton(onPressed: _saveRecipe, icon: Icon(Icons.save))],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
