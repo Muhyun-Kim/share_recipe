@@ -105,6 +105,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text("レシピ登録"),
         actions: [IconButton(onPressed: _saveRecipe, icon: Icon(Icons.save))],
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
