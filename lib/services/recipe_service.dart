@@ -11,7 +11,10 @@ class RecipeService {
 
   Future<List<Recipe>> getRecipes() async {
     final snapshot = await firestore.collection('recipes').get();
-    return snapshot.docs.map((doc) => Recipe.fromJson(doc.data())).toList();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      return Recipe.fromJson(data).copyWith(id: doc.id);
+    }).toList();
   }
 
   Future<void> updateRecipe(Recipe recipe) async {
