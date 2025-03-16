@@ -9,12 +9,30 @@ class RecipeService {
     await firestore.collection('recipes').doc(recipe.id).set(recipe.toJson());
   }
 
-  Future<List<Recipe>> getRecipes() async {
-    final snapshot = await firestore.collection('recipes').get();
+  Future<List<Recipe>> getMyRecipes(String userId) async {
+    final snapshot =
+        await firestore
+            .collection('recipes')
+            .where('userId', isEqualTo: userId)
+            .orderBy('createdAt', descending: true)
+            .get();
     return snapshot.docs.map((doc) {
       final data = doc.data();
       return Recipe.fromJson(data).copyWith(id: doc.id);
     }).toList();
+  }
+
+  Stream<List<Recipe>> streamNewRecipes() {
+    return firestore
+        .collection('recipes')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final data = doc.data();
+            return Recipe.fromJson(data).copyWith(id: doc.id);
+          }).toList();
+        });
   }
 
   Future<void> updateRecipe(Recipe recipe) async {

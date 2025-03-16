@@ -1,43 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:share_recipe/models/recipe.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_recipe/providers/my_recipe_provider.dart';
 import 'package:share_recipe/screens/add_recipe/add_recipe_screen.dart';
-import 'package:share_recipe/services/recipe_service.dart';
 
-class MyRecipeBody extends StatefulWidget {
+class MyRecipeBody extends ConsumerWidget {
   const MyRecipeBody({super.key, required this.theme});
 
   final ThemeData theme;
 
   @override
-  State<MyRecipeBody> createState() => _MyRecipeBodyState();
-}
-
-class _MyRecipeBodyState extends State<MyRecipeBody> {
-  List<Recipe> recipes = [];
-  @override
-  void initState() {
-    super.initState();
-    _fetchRecipes();
-  }
-
-  Future<void> _fetchRecipes() async {
-    final recipeService = RecipeService();
-    final recipes = await recipeService.getRecipes();
-    if (!mounted) return;
-    setState(() {
-      this.recipes = recipes;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recipes = ref.watch(myRecipesProvider);
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text('新着レシピ', style: widget.theme.textTheme.titleLarge),
+            child: Text('マイレシピ', style: theme.textTheme.titleLarge),
           ),
           GridView.builder(
             shrinkWrap: true,
@@ -60,7 +40,6 @@ class _MyRecipeBodyState extends State<MyRecipeBody> {
                           (context) => AddRecipeScreen(recipe: recipes[index]),
                     ),
                   );
-                  _fetchRecipes();
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -80,7 +59,7 @@ class _MyRecipeBodyState extends State<MyRecipeBody> {
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Text(
                           recipes[index].title,
-                          style: widget.theme.textTheme.titleMedium,
+                          style: theme.textTheme.titleMedium,
                         ),
                       ),
                     ],

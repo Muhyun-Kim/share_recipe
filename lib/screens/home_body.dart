@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_recipe/providers/new_recipe_provider.dart';
 
-class HomeBody extends StatelessWidget {
+class HomeBody extends ConsumerWidget {
   const HomeBody({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final countries = [
       {'country': "日本", 'img': "assets/images/japan.jpg"},
@@ -12,6 +14,7 @@ class HomeBody extends StatelessWidget {
       {'country': "中国", 'img': "assets/images/china.jpg"},
       {'country': "イタリア", 'img': "assets/images/italy.jpg"},
     ];
+    final newRecipes = ref.watch(newRecipesProvider);
 
     return SingleChildScrollView(
       child: Column(

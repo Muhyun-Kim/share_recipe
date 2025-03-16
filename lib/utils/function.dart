@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 Future<File> compressImg(File file) async {
   final dir = Directory.systemTemp;
@@ -25,4 +27,18 @@ Future<File> compressImg(File file) async {
   print("圧縮されたファイルサイズ: ${compressedFile.lengthSync()} bytes");
 
   return compressedFile;
+}
+
+class TimestampConverter implements JsonConverter<DateTime, Timestamp> {
+  const TimestampConverter();
+
+  @override
+  DateTime fromJson(Timestamp timestamp) {
+    return timestamp.toDate();
+  }
+
+  @override
+  Timestamp toJson(DateTime dateTime) {
+    return Timestamp.fromDate(dateTime);
+  }
 }

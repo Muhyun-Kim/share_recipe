@@ -1,26 +1,33 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_recipe/components/error.dart';
 import 'package:share_recipe/models/recipe.dart';
+import 'package:share_recipe/providers/auth_provider.dart';
+import 'package:share_recipe/providers/my_recipe_provider.dart';
 import 'package:share_recipe/services/recipe_service.dart';
 import 'package:share_recipe/utils/function.dart';
 
-class AddRecipeScreen extends StatefulWidget {
-  const AddRecipeScreen({super.key});
+class AddRecipeScreen extends ConsumerStatefulWidget {
+  const AddRecipeScreen({super.key, this.recipe});
+  final Recipe? recipe;
 
   @override
-  State<AddRecipeScreen> createState() => _AddRecipeScreenState();
+  ConsumerState<AddRecipeScreen> createState() => _AddRecipeScreenState();
 }
 
-class _AddRecipeScreenState extends State<AddRecipeScreen> {
+class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
   File? _selectedImg;
   final _imagePicker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _instructionsController = TextEditingController();
+  final _countryController = TextEditingController();
+  final _tagsController = TextEditingController();
   final List<Map<String, TextEditingController>> _ingredients = [];
 
   Future<void> _pickImg() async {
@@ -38,14 +45,32 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   void initState() {
     super.initState();
     _addNewIngredient();
+    if (widget.recipe != null) {
+      print(widget.recipe);
+      _titleController.text = widget.recipe!.title;
+      _descriptionController.text = widget.recipe!.description;
+      _countryController.text = widget.recipe!.country ?? '';
+      _tagsController.text = widget.recipe!.tags?.join(', ') ?? '';
+    }
   }
 
   void _addNewIngredient() {
     setState(() {
-      _ingredients.add({
-        'ingredient': TextEditingController(),
-        'quantity': TextEditingController(),
-      });
+      if (widget.recipe != null) {
+        _ingredients.addAll(
+          widget.recipe!.ingredients.map(
+            (e) => {
+              'ingredient': TextEditingController(text: e),
+              'quantity': TextEditingController(),
+            },
+          ),
+        );
+      } else {
+        _ingredients.add({
+          'ingredient': TextEditingController(),
+          'quantity': TextEditingController(),
+        });
+      }
     });
   }
 
@@ -68,25 +93,47 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     }
   }
 
-  Future<void> _saveRecipe() async {
-    if (_selectedImg == null) {
-      showErrorSnackBar(context, "画像を選択してください");
-      return;
-    }
-    final compressedImg = await compressImg(_selectedImg!);
-    final imgUrl = await recipeService.uploadImage(XFile(compressedImg.path));
-    if (imgUrl.isEmpty) {
-      return;
-    }
+  Future<void> _saveRecipe(User? user) async {
     if (_formKey.currentState!.validate()) {
-      final recipe = Recipe(
+      if (_selectedImg == null) {
+        showErrorSnackBar(context, "画像を選択してください");
+        return;
+      }
+      final compressedImg = await compressImg(_selectedImg!);
+      final imgUrl = await recipeService.uploadImage(XFile(compressedImg.path));
+      if (imgUrl.isEmpty) {
+        if (!mounted) return;
+        showErrorSnackBar(context, "画像のアップロードに失敗しました");
+        return;
+      }
+      final newRecipe = Recipe(
         title: _titleController.text,
         description: _descriptionController.text,
         ingredients: _ingredients.map((e) => e["ingredient"]!.text).toList(),
         imageUrl: imgUrl,
+        userId: user?.uid ?? '',
+        createdAt: widget.recipe?.createdAt ?? DateTime.now(),
+        updatedAt: DateTime.now(),
+        country: _countryController.text,
+        tags: _tagsController.text.split(',').map((e) => e.trim()).toList(),
       );
-      await recipeService.addRecipe(recipe);
+      if (widget.recipe != null) {
+        ref.read(myRecipesProvider.notifier).updateRecipe(newRecipe);
+      } else {
+        ref.read(myRecipesProvider.notifier).addRecipe(newRecipe);
+      }
+      if (!mounted) return;
+      Navigator.pop(context);
     }
+  }
+
+  Future<void> _deleteRecipe() async {
+    if (widget.recipe != null) {
+      await recipeService.deleteImage(widget.recipe!.imageUrl);
+      await recipeService.deleteRecipe(widget.recipe!.id!);
+    }
+    if (!mounted) return;
+    Navigator.pop(context);
   }
 
   @override
@@ -100,15 +147,23 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(authProvider);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text("レシピ登録"),
-        actions: [IconButton(onPressed: _saveRecipe, icon: Icon(Icons.save))],
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back),
-        ),
+        actions: [
+          widget.recipe != null
+              ? IconButton(
+                onPressed: _deleteRecipe,
+                icon: Icon(Icons.delete, color: Colors.red),
+              )
+              : const SizedBox.shrink(),
+          IconButton(
+            onPressed: () => _saveRecipe(user),
+            icon: Icon(Icons.save),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
@@ -228,7 +283,14 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 64),
+                    TextFormField(
+                      controller: _countryController,
+                      decoration: InputDecoration(labelText: '国'),
+                    ),
+                    TextFormField(
+                      controller: _tagsController,
+                      decoration: InputDecoration(labelText: 'タグ'),
+                    ),
                   ],
                 ),
               ),
