@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_recipe/components/recipe_thumbnail.dart';
 import 'package:share_recipe/providers/new_recipe_provider.dart';
 
 class HomeBody extends ConsumerWidget {
@@ -65,31 +66,33 @@ class HomeBody extends ConsumerWidget {
               );
             },
           ),
-
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text('新着レシピ', style: theme.textTheme.titleLarge),
           ),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.75,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-            ),
-            itemCount: 6,
-            itemBuilder: (context, index) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(child: Text('新着レシピ ${index + 1}')),
-              );
-            },
+          newRecipes.when(
+            data:
+                (recipes) =>
+                    recipes.isEmpty
+                        ? const Center(child: Text('新着レシピがありません'))
+                        : GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(16),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 1.5,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                              ),
+                          itemCount: recipes.length,
+                          itemBuilder:
+                              (context, index) =>
+                                  RecipeThumbnail(recipe: recipes[index]),
+                        ),
+            error: (error, stack) => const Center(child: Text('エラーが発生しました')),
+            loading: () => const Center(child: CircularProgressIndicator()),
           ),
         ],
       ),
