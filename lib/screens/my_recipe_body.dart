@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_recipe/components/recipe_thumbnail.dart';
 import 'package:share_recipe/providers/my_recipe_provider.dart';
 import 'package:share_recipe/screens/add_recipe/add_recipe_screen.dart';
 
@@ -31,7 +32,8 @@ class MyRecipeBody extends ConsumerWidget {
             ),
             itemCount: recipes.length,
             itemBuilder: (context, index) {
-              return GestureDetector(
+              return RecipeThumbnail(
+                recipe: recipes[index],
                 onTap: () async {
                   await Navigator.push(
                     context,
@@ -41,30 +43,6 @@ class MyRecipeBody extends ConsumerWidget {
                     ),
                   );
                 },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Image.network(
-                          recipes[index].imageUrl,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Text(
-                          recipes[index].title,
-                          style: theme.textTheme.titleMedium,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               );
             },
           ),
