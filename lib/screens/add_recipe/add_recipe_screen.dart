@@ -20,7 +20,7 @@ class AddRecipeScreen extends ConsumerStatefulWidget {
 }
 
 class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
-  File? _selectedImg;
+  String? _selectedImg;
   final _imagePicker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
@@ -36,7 +36,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
     );
     if (pickedFile != null) {
       setState(() {
-        _selectedImg = File(pickedFile.path);
+        _selectedImg = pickedFile.path;
       });
     }
   }
@@ -51,6 +51,9 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
       _descriptionController.text = widget.recipe!.description;
       _countryController.text = widget.recipe!.country ?? '';
       _tagsController.text = widget.recipe!.tags?.join(', ') ?? '';
+      if (widget.recipe!.imageUrl.isNotEmpty) {
+        _selectedImg = widget.recipe!.imageUrl;
+      }
     }
   }
 
@@ -99,7 +102,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
         showErrorSnackBar(context, "画像を選択してください");
         return;
       }
-      final compressedImg = await compressImg(_selectedImg!);
+      final compressedImg = await compressImg(File(_selectedImg!));
       final imgUrl = await recipeService.uploadImage(XFile(compressedImg.path));
       if (imgUrl.isEmpty) {
         if (!mounted) return;
@@ -177,11 +180,11 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child:
-                    _selectedImg == null
-                        ? InkWell(
-                          onTap: _pickImg,
-                          child: Column(
+                child: InkWell(
+                  onTap: _pickImg, // ✅ 클릭하면 새로운 이미지 선택 가능
+                  child:
+                      _selectedImg == null
+                          ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
@@ -195,9 +198,25 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ],
+                          )
+                          : ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child:
+                                _selectedImg!.startsWith('http')
+                                    ? Image.network(
+                                      _selectedImg!,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: 200,
+                                    )
+                                    : Image.file(
+                                      File(_selectedImg!),
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: 200,
+                                    ),
                           ),
-                        )
-                        : Image.file(_selectedImg!, fit: BoxFit.cover),
+                ),
               ),
               Form(
                 key: _formKey,
