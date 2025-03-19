@@ -22,6 +22,19 @@ class RecipeService {
     }).toList();
   }
 
+  Future<List<Recipe>> getRecipesByTags(List<String> tags) async {
+    final snapshot =
+        await firestore
+            .collection('recipes')
+            .where('tags', arrayContainsAny: tags)
+            .orderBy('createdAt', descending: true)
+            .get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      return Recipe.fromJson(data).copyWith(id: doc.id);
+    }).toList();
+  }
+
   Stream<List<Recipe>> streamNewRecipes() {
     return firestore
         .collection('recipes')
