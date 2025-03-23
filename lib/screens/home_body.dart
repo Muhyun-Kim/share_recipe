@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_recipe/components/recipe_thumbnail.dart';
 import 'package:share_recipe/providers/new_recipe_provider.dart';
+import 'package:share_recipe/screens/add_recipe/add_recipe_screen.dart';
 import 'package:share_recipe/screens/country_recipe/country_recipe_screen.dart';
 
 class HomeBody extends ConsumerWidget {
@@ -102,8 +103,19 @@ class HomeBody extends ConsumerWidget {
                               ),
                           itemCount: recipes.length,
                           itemBuilder:
-                              (context, index) =>
-                                  RecipeThumbnail(recipe: recipes[index]),
+                              (context, index) => RecipeThumbnail(
+                                recipe: recipes[index],
+                                onTap:
+                                    () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => AddRecipeScreen(
+                                              recipe: recipes[index],
+                                            ),
+                                      ),
+                                    ),
+                              ),
                         ),
             error: (error, stack) => const Center(child: Text('エラーが発生しました')),
             loading: () => const Center(child: CircularProgressIndicator()),

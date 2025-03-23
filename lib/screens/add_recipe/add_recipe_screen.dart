@@ -46,7 +46,6 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
     super.initState();
     _addNewIngredient();
     if (widget.recipe != null) {
-      print(widget.recipe);
       _titleController.text = widget.recipe!.title;
       _descriptionController.text = widget.recipe!.description;
       _countryController.text = widget.recipe!.country ?? '';
@@ -151,6 +150,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider);
+    bool isMyRecipe = widget.recipe?.userId == user?.uid;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -162,10 +162,11 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                 icon: Icon(Icons.delete, color: Colors.red),
               )
               : const SizedBox.shrink(),
-          IconButton(
-            onPressed: () => _saveRecipe(user),
-            icon: Icon(Icons.save),
-          ),
+          if (isMyRecipe)
+            IconButton(
+              onPressed: () => {_saveRecipe(user)},
+              icon: Icon(Icons.save),
+            ),
         ],
       ),
       body: Padding(
@@ -181,7 +182,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: InkWell(
-                  onTap: _pickImg, // ✅ 클릭하면 새로운 이미지 선택 가능
+                  onTap: isMyRecipe ? _pickImg : null,
                   child:
                       _selectedImg == null
                           ? Column(
@@ -223,6 +224,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                 child: Column(
                   children: [
                     TextFormField(
+                      enabled: isMyRecipe,
                       controller: _titleController,
                       decoration: InputDecoration(labelText: 'タイトル'),
                       validator: (value) {
@@ -233,6 +235,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                       },
                     ),
                     TextFormField(
+                      enabled: isMyRecipe,
                       controller: _descriptionController,
                       decoration: InputDecoration(labelText: '説明'),
                       validator: (value) {
@@ -261,6 +264,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                                     children: [
                                       Expanded(
                                         child: TextFormField(
+                                          enabled: isMyRecipe,
                                           controller:
                                               _ingredients[index]["ingredient"],
                                           decoration: InputDecoration(
@@ -273,6 +277,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                                       SizedBox(width: 8),
                                       Expanded(
                                         child: TextFormField(
+                                          enabled: isMyRecipe,
                                           controller:
                                               _ingredients[index]["quantity"],
                                           decoration: InputDecoration(
@@ -292,6 +297,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                       ),
                     ),
                     TextFormField(
+                      enabled: isMyRecipe,
                       controller: _instructionsController,
                       decoration: InputDecoration(labelText: '作り方'),
                       maxLines: null,
@@ -303,10 +309,12 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                       },
                     ),
                     TextFormField(
+                      enabled: isMyRecipe,
                       controller: _countryController,
                       decoration: InputDecoration(labelText: '国'),
                     ),
                     TextFormField(
+                      enabled: isMyRecipe,
                       controller: _tagsController,
                       decoration: InputDecoration(labelText: 'タグ'),
                     ),
