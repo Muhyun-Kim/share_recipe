@@ -13,6 +13,8 @@ _$RecipeImpl _$$RecipeImplFromJson(Map<String, dynamic> json) => _$RecipeImpl(
   title: json['title'] as String,
   ingredients:
       (json['ingredients'] as List<dynamic>).map((e) => e as String).toList(),
+  quantities:
+      (json['quantities'] as List<dynamic>).map((e) => e as String).toList(),
   description: json['description'] as String,
   imageUrl: json['imageUrl'] as String,
   userId: json['userId'] as String,
@@ -31,6 +33,7 @@ Map<String, dynamic> _$$RecipeImplToJson(_$RecipeImpl instance) =>
       'tags': instance.tags,
       'title': instance.title,
       'ingredients': instance.ingredients,
+      'quantities': instance.quantities,
       'description': instance.description,
       'imageUrl': instance.imageUrl,
       'userId': instance.userId,

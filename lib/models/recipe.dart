@@ -13,6 +13,7 @@ class Recipe with _$Recipe {
     List<String>? tags,
     required String title,
     required List<String> ingredients,
+    required List<String> quantities,
     required String description,
     required String imageUrl,
     required String userId,

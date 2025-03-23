@@ -26,6 +26,7 @@ mixin _$Recipe {
   List<String>? get tags => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   List<String> get ingredients => throw _privateConstructorUsedError;
+  List<String> get quantities => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
   String get imageUrl => throw _privateConstructorUsedError;
   String get userId => throw _privateConstructorUsedError;
@@ -54,6 +55,7 @@ abstract class $RecipeCopyWith<$Res> {
     List<String>? tags,
     String title,
     List<String> ingredients,
+    List<String> quantities,
     String description,
     String imageUrl,
     String userId,
@@ -82,6 +84,7 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
     Object? tags = freezed,
     Object? title = null,
     Object? ingredients = null,
+    Object? quantities = null,
     Object? description = null,
     Object? imageUrl = null,
     Object? userId = null,
@@ -114,6 +117,11 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
                 null == ingredients
                     ? _value.ingredients
                     : ingredients // ignore: cast_nullable_to_non_nullable
+                        as List<String>,
+            quantities:
+                null == quantities
+                    ? _value.quantities
+                    : quantities // ignore: cast_nullable_to_non_nullable
                         as List<String>,
             description:
                 null == description
@@ -160,6 +168,7 @@ abstract class _$$RecipeImplCopyWith<$Res> implements $RecipeCopyWith<$Res> {
     List<String>? tags,
     String title,
     List<String> ingredients,
+    List<String> quantities,
     String description,
     String imageUrl,
     String userId,
@@ -187,6 +196,7 @@ class __$$RecipeImplCopyWithImpl<$Res>
     Object? tags = freezed,
     Object? title = null,
     Object? ingredients = null,
+    Object? quantities = null,
     Object? description = null,
     Object? imageUrl = null,
     Object? userId = null,
@@ -219,6 +229,11 @@ class __$$RecipeImplCopyWithImpl<$Res>
             null == ingredients
                 ? _value._ingredients
                 : ingredients // ignore: cast_nullable_to_non_nullable
+                    as List<String>,
+        quantities:
+            null == quantities
+                ? _value._quantities
+                : quantities // ignore: cast_nullable_to_non_nullable
                     as List<String>,
         description:
             null == description
@@ -259,13 +274,15 @@ class _$RecipeImpl implements _Recipe {
     final List<String>? tags,
     required this.title,
     required final List<String> ingredients,
+    required final List<String> quantities,
     required this.description,
     required this.imageUrl,
     required this.userId,
     @TimestampConverter() required this.createdAt,
     @TimestampConverter() required this.updatedAt,
   }) : _tags = tags,
-       _ingredients = ingredients;
+       _ingredients = ingredients,
+       _quantities = quantities;
 
   factory _$RecipeImpl.fromJson(Map<String, dynamic> json) =>
       _$$RecipeImplFromJson(json);
@@ -294,6 +311,14 @@ class _$RecipeImpl implements _Recipe {
     return EqualUnmodifiableListView(_ingredients);
   }
 
+  final List<String> _quantities;
+  @override
+  List<String> get quantities {
+    if (_quantities is EqualUnmodifiableListView) return _quantities;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_quantities);
+  }
+
   @override
   final String description;
   @override
@@ -309,7 +334,7 @@ class _$RecipeImpl implements _Recipe {
 
   @override
   String toString() {
-    return 'Recipe(id: $id, country: $country, tags: $tags, title: $title, ingredients: $ingredients, description: $description, imageUrl: $imageUrl, userId: $userId, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Recipe(id: $id, country: $country, tags: $tags, title: $title, ingredients: $ingredients, quantities: $quantities, description: $description, imageUrl: $imageUrl, userId: $userId, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -324,6 +349,10 @@ class _$RecipeImpl implements _Recipe {
             const DeepCollectionEquality().equals(
               other._ingredients,
               _ingredients,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._quantities,
+              _quantities,
             ) &&
             (identical(other.description, description) ||
                 other.description == description) &&
@@ -345,6 +374,7 @@ class _$RecipeImpl implements _Recipe {
     const DeepCollectionEquality().hash(_tags),
     title,
     const DeepCollectionEquality().hash(_ingredients),
+    const DeepCollectionEquality().hash(_quantities),
     description,
     imageUrl,
     userId,
@@ -373,6 +403,7 @@ abstract class _Recipe implements Recipe {
     final List<String>? tags,
     required final String title,
     required final List<String> ingredients,
+    required final List<String> quantities,
     required final String description,
     required final String imageUrl,
     required final String userId,
@@ -392,6 +423,8 @@ abstract class _Recipe implements Recipe {
   String get title;
   @override
   List<String> get ingredients;
+  @override
+  List<String> get quantities;
   @override
   String get description;
   @override

@@ -50,8 +50,21 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
       _descriptionController.text = widget.recipe!.description;
       _countryController.text = widget.recipe!.country ?? '';
       _tagsController.text = widget.recipe!.tags?.join(', ') ?? '';
+
       if (widget.recipe!.imageUrl.isNotEmpty) {
         _selectedImg = widget.recipe!.imageUrl;
+      }
+      _ingredients.clear();
+      final recipeIngredients = widget.recipe!.ingredients;
+      final recipeQuantities = widget.recipe!.quantities;
+
+      for (int i = 0; i < recipeIngredients.length; i++) {
+        _ingredients.add({
+          'ingredient': TextEditingController(text: recipeIngredients[i]),
+          'quantity': TextEditingController(
+            text: (recipeQuantities.length > i) ? recipeQuantities[i] : '',
+          ),
+        });
       }
     }
   }
@@ -112,6 +125,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
         title: _titleController.text,
         description: _descriptionController.text,
         ingredients: _ingredients.map((e) => e["ingredient"]!.text).toList(),
+        quantities: _ingredients.map((e) => e["quantity"]!.text).toList(),
         imageUrl: imgUrl,
         userId: user?.uid ?? '',
         createdAt: widget.recipe?.createdAt ?? DateTime.now(),
@@ -150,7 +164,9 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider);
-    bool isMyRecipe = widget.recipe?.userId == user?.uid;
+    bool isMyRecipe =
+        widget.recipe == null || widget.recipe?.userId == user?.uid;
+    print(isMyRecipe);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
